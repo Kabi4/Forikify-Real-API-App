@@ -1,10 +1,12 @@
 import Search from './model/Search';
 import Recipe from './model/Recipie';
-import List from './model/List'
+import List from './model/List';
+import Likes from './model/Likes';
 import {element,addLoader,removeLoader, elementsString} from './DOM Elements/Elements';
 import * as searchView from './view/searchView';
 import * as recipeView from './view/recipeView';
 import * as listView from './view/Listview';
+import * as likesView from './view/likesView';
 
 const state = {};
 
@@ -50,7 +52,7 @@ const GettingRecipe = async ()=>{
         state.recipe.calcServing();
         state.recipe.calcTime();
         state.recipe.parseIngredients();
-        recipeView.renderRecipies(state.recipe);
+        recipeView.renderRecipies(state.recipe,state.likes.isLiked(state.recipe.id));
         removeLoader();
     }
 };
@@ -60,11 +62,41 @@ window.addEventListener('hashchange',(e)=>{
     GettingRecipe();
 });
 
-window.addEventListener('load',GettingRecipe);
+window.addEventListener('load',()=>{
+    state.likes = new Likes();
+    state.likes.getLocalStorage();
+    //console.log(state.likes.Likes);
+    likesView.toggleLikemenu(state.likes.likes?state.likes.likes.length===0?false:true:false);
+    //console.log(state.likes.Likes[0]);
+    state.likes.likes.forEach(item=>{
+        likesView.addItemToLikeUI(item);
+    });
+    GettingRecipe();
+});
+
+
+
 
 // ['hashchange','load'].forEach((e)=>{
 //     window.addEventListener(e,GettingRecipe);
 // })
+
+const LikeEvent = ()=>{
+    if(!state.likes)state.likes = new Likes();
+    const ID = state.recipe.id;
+    if(state.likes.isLiked(ID)){
+        state.likes.deleteItem(ID);
+        likesView.toggleHeart(false);
+        likesView.deleteItemFormUI(ID);
+        console.log(state.likes);
+    }else{
+        const Likeditem = state.likes.addItem(ID,state.recipe.author,state.recipe.title,state.recipe.image);
+        console.log(state.likes);
+        likesView.toggleHeart(true);
+        likesView.addItemToLikeUI(Likeditem);
+    }
+    likesView.toggleLikemenu(state.likes.likes.length);
+};
 
 element.recipeDescription.addEventListener('click',(e)=>{
     const btn = e.target.closest('.recipe__btn');
@@ -85,13 +117,13 @@ element.recipeDescription.addEventListener('click',(e)=>{
             state.recipe.updateServings('dec');
             recipeView.updateServings(state.recipe);
         }
-    }
+    } 
     else if(e.target.matches('.btn-increase, .btn-increase *')){
         state.recipe.updateServings('inc');
         recipeView.updateServings(state.recipe);
     }
-    else if(e.target.matches('recipe__btn, recipe__btn *')){
-        
+    else if(e.target.matches('.recipe__love, .recipe__love *')){
+        LikeEvent();
     }    
 });
 

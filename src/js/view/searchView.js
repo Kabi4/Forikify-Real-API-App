@@ -8,7 +8,7 @@ export const clearInputField = ()=>{
     element.searchInput.value = "";
 };
 
-const cropTitle = (title,limit=17)=>{
+export const cropTitle = (title,limit=17)=>{
     if(title.length>limit){
         let answer = "";
         answer = title.split(' ').reduce((res,cur)=>{

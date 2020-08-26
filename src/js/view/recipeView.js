@@ -63,7 +63,7 @@ const getItem = (item) => {
     `;
 };
 
-export const renderRecipies = (recepie)=>{
+export const renderRecipies = (recepie,isLiked)=>{
     const markup = `
     <figure class="recipe__fig">
         <img src="${recepie.image}" alt="Tomato" class="recipe__img">
@@ -102,7 +102,7 @@ export const renderRecipies = (recepie)=>{
         </div>
         <button class="recipe__love">
             <svg class="header__likes">
-                <use href="img/icons.svg#icon-heart-outlined"></use>
+                <use href="img/icons.svg#icon-heart${isLiked?"":'-outlined'}"></use>
             </svg>
         </button>
     </div>
@@ -139,7 +139,6 @@ export const renderRecipies = (recepie)=>{
     </div>
     `;
     element.recipeDescription.insertAdjacentHTML('afterbegin',markup);
-    console.lo
 };
 
 export const updateServings = (recepie) =>{
